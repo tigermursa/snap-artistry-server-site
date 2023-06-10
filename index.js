@@ -36,15 +36,15 @@ async function run() {
     res.send(result);
   });
   //2.  GET /READ FROM HERE......
-  // app.get("/cart", async (req, res) => {
-  //   const email = req.query.email;
-  //   if (!email) {
-  //     res.send([]);
-  //   }
-  //   const query = { email: email };
-  //   const result = await cartCollection.find(query).toArray();
-  //   res.send(result);
-  // });
+  app.get("/cart", async (req, res) => {
+    const email = req.query.email;
+    if (!email) {
+      res.send([]);
+    }
+    const query = { email: email };
+    const result = await cartCollection.find(query).toArray();
+    res.send(result);
+  });
 
   //4. DELETE FROM HERE .....
   // app.delete("/cart/:id", async (req, res) => {
