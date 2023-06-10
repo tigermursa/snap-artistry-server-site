@@ -47,13 +47,13 @@ async function run() {
   });
 
   //4. DELETE FROM HERE .....
-  // app.delete("/cart/:id", async (req, res) => {
-  //   const id = req.params.id;
-  //   console.log("deleting ", id);
-  //   const query = { _id: new ObjectId(id) };
-  //   const result = await cartCollection.deleteOne(query);
-  //   res.send(result);
-  // });
+  app.delete("/cart/:id", async (req, res) => {
+    const id = req.params.id;
+    console.log("deleting ", id);
+    const query = { _id: new ObjectId(id) };
+    const result = await cartCollection.deleteOne(query);
+    res.send(result);
+  });
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> cart api zone starts....>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> users api zone starts....>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
