@@ -72,11 +72,11 @@ async function run() {
   });
 
   //2.  GET /READ FROM USERS HERE......
-  // app.get("/users", async (req, res) => {
-  //   const cursor = usersCollection.find();
-  //   const result = await cursor.toArray();
-  //   res.send(result);
-  // });
+  app.get("/users", async (req, res) => {
+    const cursor = usersCollection.find();
+    const result = await cursor.toArray();
+    res.send(result);
+  });
 
   // 3 PATCH USERS
   // app.patch("/users/admin/:id", async (req, res) => {
