@@ -58,18 +58,18 @@ async function run() {
 
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> users api zone starts....>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
   //1. POST/CREATE USERS FROM HERE...
-  // app.post("/users", async (req, res) => {
-  //   const user = req.body;
-  //   console.log("new user", user);
-  //   const query = { email: user.email };
-  //   const existingUser = await usersCollection.findOne(query);
-  //   console.log(existingUser);
-  //   if (existingUser) {
-  //     return res.send({ massage: "user already exists" });
-  //   }
-  //   const result = await usersCollection.insertOne(user);
-  //   res.send(result);
-  // });
+  app.post("/users", async (req, res) => {
+    const user = req.body;
+    console.log("new user", user);
+    const query = { email: user.email };
+    const existingUser = await usersCollection.findOne(query);
+    console.log(existingUser);
+    if (existingUser) {
+      return res.send({ massage: "user already exists" });
+    }
+    const result = await usersCollection.insertOne(user);
+    res.send(result);
+  });
 
   //2.  GET /READ FROM USERS HERE......
   // app.get("/users", async (req, res) => {
