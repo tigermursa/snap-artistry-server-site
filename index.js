@@ -36,64 +36,64 @@ async function run() {
     res.send(result);
   });
   //2.  GET /READ FROM HERE......
-  app.get("/cart", async (req, res) => {
-    const email = req.query.email;
-    if (!email) {
-      res.send([]);
-    }
-    const query = { email: email };
-    const result = await cartCollection.find(query).toArray();
-    res.send(result);
-  });
+  // app.get("/cart", async (req, res) => {
+  //   const email = req.query.email;
+  //   if (!email) {
+  //     res.send([]);
+  //   }
+  //   const query = { email: email };
+  //   const result = await cartCollection.find(query).toArray();
+  //   res.send(result);
+  // });
 
   //4. DELETE FROM HERE .....
-  app.delete("/cart/:id", async (req, res) => {
-    const id = req.params.id;
-    console.log("deleting ", id);
-    const query = { _id: new ObjectId(id) };
-    const result = await cartCollection.deleteOne(query);
-    res.send(result);
-  });
+  // app.delete("/cart/:id", async (req, res) => {
+  //   const id = req.params.id;
+  //   console.log("deleting ", id);
+  //   const query = { _id: new ObjectId(id) };
+  //   const result = await cartCollection.deleteOne(query);
+  //   res.send(result);
+  // });
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> cart api zone starts....>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> users api zone starts....>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
   //1. POST/CREATE USERS FROM HERE...
-  app.post("/users", async (req, res) => {
-    const user = req.body;
-    console.log("new user", user);
-    const query = { email: user.email };
-    const existingUser = await usersCollection.findOne(query);
-    console.log(existingUser);
-    if (existingUser) {
-      return res.send({ massage: "user already exists" });
-    }
-    const result = await usersCollection.insertOne(user);
-    res.send(result);
-  });
+  // app.post("/users", async (req, res) => {
+  //   const user = req.body;
+  //   console.log("new user", user);
+  //   const query = { email: user.email };
+  //   const existingUser = await usersCollection.findOne(query);
+  //   console.log(existingUser);
+  //   if (existingUser) {
+  //     return res.send({ massage: "user already exists" });
+  //   }
+  //   const result = await usersCollection.insertOne(user);
+  //   res.send(result);
+  // });
 
   //2.  GET /READ FROM USERS HERE......
-  app.get("/users", async (req, res) => {
-    const cursor = usersCollection.find();
-    const result = await cursor.toArray();
-    res.send(result);
-  });
+  // app.get("/users", async (req, res) => {
+  //   const cursor = usersCollection.find();
+  //   const result = await cursor.toArray();
+  //   res.send(result);
+  // });
 
   // 3 PATCH USERS
-  app.patch("/users/admin/:id", async (req, res) => {
-    const id = req.params.id;
-    console.log(id);
-    const filter = { _id: new ObjectId(id) };
-    const updateDoc = {
-      $set: {
-        role: "admin",
-      },
-    };
+  // app.patch("/users/admin/:id", async (req, res) => {
+  //   const id = req.params.id;
+  //   console.log(id);
+  //   const filter = { _id: new ObjectId(id) };
+  //   const updateDoc = {
+  //     $set: {
+  //       role: "admin",
+  //     },
+  //   };
 
     const result = await usersCollection.updateOne(filter, updateDoc);
     res.send(result);
   });
 
-  
+
 // 4 DELETE USERS 
   app.delete("/users/:id", async (req, res) => {
     const id = req.params.id;
