@@ -203,6 +203,31 @@ async function run() {
     const result = await cursor.toArray();
     res.send(result);
   });
+  app.post("/classes", async (req, res) => {
+    const newClass = req.body;
+    console.log("New class", newClass);
+
+    const { email, className } = newClass;
+
+    const query = { email: email, className: className };
+    const existingCartItem = await classesCollection.findOne(query);
+
+    if (existingCartItem) {
+      return res.send({ message: "Class already exists in the cart" });
+    }
+
+    const result = await classesCollection.insertOne(newClass);
+    res.send(result);
+  });
+  // get data by email
+  app.get("/classes/email/:email", async (req, res) => {
+    const result = await classesCollection
+      .find({
+        email: req.params.email,
+      })
+      .toArray();
+    res.send(result);
+  });
 
   app.listen(port, () => {
     console.log(`Server is running on port: ${port}`);
