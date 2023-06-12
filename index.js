@@ -8,6 +8,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.1nqrclq.mongodb.net/?retryWrites=true&w=majority`;
 
+// middleware here .........................................
 app.use(cors());
 app.use(express.json());
 
@@ -47,7 +48,7 @@ async function run() {
     console.error("Failed to connect to MongoDB:", error);
     return;
   }
-
+// mongodb database and collection ..................................
   const db = client.db("summerCamp");
   const classesCollection = db.collection("classes");
   const usersCollection = db.collection("users");
@@ -66,7 +67,9 @@ async function run() {
     const result = { admin: user?.role === "admin" };
     res.send(result);
   });
-  // ins
+
+
+  // instructor.......................................................
   app.get("/users/instructor/:email", verifyJWT, async (req, res) => {
     const email = req.params.email;
 
@@ -107,7 +110,7 @@ async function run() {
   //   next();
   // };
 
-  // create payment intent>>>>>.
+  // create payment intent..................................................
   app.post("/create-payment-intent", verifyJWT, async (req, res) => {
     const { price } = req.body;
     const amount = parseInt(price * 100);
@@ -122,7 +125,7 @@ async function run() {
     });
   });
 
-  // all payment code here >>>>
+  // all payment code here ..................................................
   app.post("/payments", verifyJWT, async (req, res) => {
     const payment = req.body;
     const insertResult = await paymentCollection.insertOne(payment);
@@ -145,7 +148,7 @@ async function run() {
     res.send(result);
   });
   //
-
+// cart codes here ..................................................
   app.post("/cart", async (req, res) => {
     const cartItem = req.body;
     console.log("New cart item", cartItem);
@@ -184,7 +187,7 @@ async function run() {
     const result = await cartCollection.deleteOne(query);
     res.send(result);
   });
-
+// users code here ..................................................
   app.post("/users", async (req, res) => {
     const user = req.body;
     console.log("New user", user);
@@ -246,7 +249,7 @@ async function run() {
       res.status(500).send({ success: false, message: "An error occurred" });
     }
   });
-
+// classes code here ......................................................
   app.get("/classes", async (req, res) => {
     const cursor = classesCollection.find();
     const result = await cursor.toArray();
@@ -269,7 +272,7 @@ async function run() {
     const result = await classesCollection.insertOne(newClass);
     res.send(result);
   });
-  // get data by email
+  // get data by email code ....................................................
   app.get("/classes/email/:email", async (req, res) => {
     const result = await classesCollection
       .find({
@@ -278,7 +281,7 @@ async function run() {
       .toArray();
     res.send(result);
   });
-  // 5. DELETE user by ID
+  //  DELETE user by ID
   app.delete("/classes/:id", async (req, res) => {
     const id = req.params.id;
     console.log("deleting classes", id);
@@ -287,7 +290,7 @@ async function run() {
     res.send(result);
   });
 
-  // 3. GET specific user by ID
+  //  GET specific user by ID
   app.get("/classes/:id", async (req, res) => {
     const id = req.params.id;
     console.log("fetching classes", id);
@@ -295,7 +298,7 @@ async function run() {
     const result = await classesCollection.findOne(query);
     res.send(result);
   });
-  // patch
+  // patch code here.....................................................
 
   app.patch("/classes/:id/status", async (req, res) => {
     const id = req.params.id;
@@ -318,7 +321,7 @@ async function run() {
     }
   });
 
-  // 4. PUT/UPDATE class by ID
+  //  PUT/UPDATE class by ID.......................................................
   app.put("/classes/:id", async (req, res) => {
     const id = req.params.id;
     const classData = req.body;
@@ -348,7 +351,9 @@ async function run() {
     );
     res.send(result);
   });
-
+  app.get("/", async (req, res) => {
+    res.send("camp running yay yay");
+  });
   // end
   app.listen(port, () => {
     console.log(`Server is running on port: ${port}`);
