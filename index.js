@@ -3,7 +3,7 @@ const cors = require("cors");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
-
+const stripe = require("stripe")(process.env.PAYMENT_SECRET_KEY);
 const app = express();
 const port = process.env.PORT || 3000;
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.1nqrclq.mongodb.net/?retryWrites=true&w=majority`;
@@ -52,6 +52,7 @@ async function run() {
   const classesCollection = db.collection("classes");
   const usersCollection = db.collection("users");
   const cartCollection = db.collection("cart");
+  const paymentCollection = db.collection("payment");
 
   app.get("/users/admin/:email", verifyJWT, async (req, res) => {
     const email = req.params.email;
@@ -96,6 +97,54 @@ async function run() {
     }
     next();
   };
+  // const verifyInstructor = async (req, res, next) => {
+  //   const email = req.decoded.email;
+  //   const query = { email: email };
+  //   const user = await usersCollection.findOne(query);
+  //   if (user?.role !== "instructor") {
+  //     return res.status(403).send({ error: true, message: "Forbidden access" });
+  //   }
+  //   next();
+  // };
+
+  // create payment intent>>>>>.
+  app.post("/create-payment-intent", verifyJWT, async (req, res) => {
+    const { price } = req.body;
+    const amount = parseInt(price * 100);
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: amount,
+      currency: "usd",
+      payment_method_types: ["card"],
+    });
+
+    res.send({
+      clientSecret: paymentIntent.client_secret,
+    });
+  });
+
+  // all payment code here >>>>
+  app.post("/payments", verifyJWT, async (req, res) => {
+    const payment = req.body;
+    const insertResult = await paymentCollection.insertOne(payment);
+
+    const query = {
+      _id: { $in: payment.cartItems.map((id) => new ObjectId(id)) },
+    };
+    const deleteResult = await cartCollection.deleteMany(query);
+
+    res.send({ insertResult, deleteResult });
+  });
+
+  // get
+  app.get("/payments", async (req, res) => {
+    const { email } = req.query;
+
+    const cursor = paymentCollection.find({ email: email });
+    const result = await cursor.toArray();
+
+    res.send(result);
+  });
+  //
 
   app.post("/cart", async (req, res) => {
     const cartItem = req.body;
@@ -203,6 +252,7 @@ async function run() {
     const result = await cursor.toArray();
     res.send(result);
   });
+
   app.post("/classes", async (req, res) => {
     const newClass = req.body;
     console.log("New class", newClass);
@@ -228,7 +278,78 @@ async function run() {
       .toArray();
     res.send(result);
   });
+  // 5. DELETE user by ID
+  app.delete("/classes/:id", async (req, res) => {
+    const id = req.params.id;
+    console.log("deleting classes", id);
+    const query = { _id: new ObjectId(id) };
+    const result = await classesCollection.deleteOne(query);
+    res.send(result);
+  });
 
+  // 3. GET specific user by ID
+  app.get("/classes/:id", async (req, res) => {
+    const id = req.params.id;
+    console.log("fetching classes", id);
+    const query = { _id: new ObjectId(id) };
+    const result = await classesCollection.findOne(query);
+    res.send(result);
+  });
+  // patch
+
+  app.patch("/classes/:id/status", async (req, res) => {
+    const id = req.params.id;
+    const { status } = req.body;
+    console.log("Updating status for class", id);
+
+    const filter = { _id: new ObjectId(id) };
+    const update = { $set: { status } };
+
+    try {
+      const result = await db.collection("classes").updateOne(filter, update);
+      if (result.modifiedCount === 1) {
+        res.status(200).json({ message: "Class status updated successfully" });
+      } else {
+        res.status(404).json({ error: "Class not found" });
+      }
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  // 4. PUT/UPDATE class by ID
+  app.put("/classes/:id", async (req, res) => {
+    const id = req.params.id;
+    const classData = req.body;
+    console.log("Updating class", id);
+
+    const filter = { _id: new ObjectId(id) };
+    const options = { upsert: true };
+
+    const updatedClass = {
+      $set: {
+        className: classData.className,
+        classImage: classData.classImage,
+        classEnrolled: classData.classEnrolled,
+        instructorName: classData.instructorName,
+        totalClassesTaken: classData.totalClassesTaken,
+        price: classData.price,
+        instructorImage: classData.instructorImage,
+        availableSeats: classData.availableSeats,
+        email: classData.email,
+      },
+    };
+
+    const result = await classesCollection.updateOne(
+      filter,
+      updatedClass,
+      options
+    );
+    res.send(result);
+  });
+
+  // end
   app.listen(port, () => {
     console.log(`Server is running on port: ${port}`);
   });
